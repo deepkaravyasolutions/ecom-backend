@@ -1,4 +1,3 @@
-// server.js
 const express = require("express");
 const mongoose = require("mongoose");
 const bodyParser = require("body-parser");
@@ -13,7 +12,11 @@ const app = express();
 dotEnv.config();
 
 // Middleware
-app.use(cors());
+app.use(cors({
+    origin: '*',
+    credentials: false
+}));
+
 app.use(bodyParser.json());
 
 // Basic route
@@ -30,16 +33,16 @@ app.use("/api/product", productRoutes);
 const connectDB = async () => {
     try {
         const DB_URI = process.env.DB_URI.replace("<db_password>", process.env.DB_PASSWORD);
-        
+
         // Add connection options
         const options = {
-            useNewUrlParser: true,
-            useUnifiedTopology: true,
-            serverSelectionTimeoutMS: 5000, // Timeout after 5s instead of 30s
-            socketTimeoutMS: 45000, // Close sockets after 45s
+            // useNewUrlParser: true,
+            // useUnifiedTopology: true,
+            serverSelectionTimeoutMS: 5000,
+            socketTimeoutMS: 45000,
         };
 
-        await mongoose.connect(DB_URI, options);
+        await mongoose.connect(DB_URI);
         console.log('MongoDB Connected Successfully!');
         
         // Listen for errors after initial connection
@@ -53,7 +56,7 @@ const connectDB = async () => {
 
     } catch (err) {
         console.error('MongoDB connection error:', err);
-        process.exit(1); // Exit process with failure
+        process.exit(1);
     }
 };
 
@@ -63,7 +66,7 @@ connectDB();
 // Start server
 const PORT = process.env.PORT || 5000;
 app.listen(PORT, () => {
-    console.log(`Server is running on port ${PORT}`);
+  console.log(`Server is running on port ${PORT}`);
 });
 
 // Handle unhandled promise rejections
