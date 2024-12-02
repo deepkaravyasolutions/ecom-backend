@@ -32,7 +32,7 @@ app.use("/api/product", productRoutes);
 // MongoDB Connection with better error handling
 const connectDB = async () => {
     try {
-        const DB_URI = process.env.DB_URI.replace("<db_password>", process.env.DB_PASSWORD);
+        const DB_URI = process.env.DB_URI;
 
         // Add connection options
         const options = {

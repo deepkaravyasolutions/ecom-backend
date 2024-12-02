@@ -74,6 +74,11 @@ router.get("/sub-categories", async (req, res) => {
         res.status(500).json({ error: "Failed to retrieve sub-categories" });
     }
 });
+/**
+ * push the code before making any changes. 
+ * I don't have password for username:deep.karavyasolutions so code could not be pushed.
+ * 
+ */
 
 router.get("/", async (req, res) => {
     console.log("req.query: ", req.query);
@@ -83,27 +88,43 @@ router.get("/", async (req, res) => {
 
     try {
         if (searchParams) {
-            const filteredCategories = await Category.find({
+            const categories = await Category.find({
                 name: { $regex: searchParams, $options: 'i' }
             }).skip((page - 1) * limit).limit(limit);
 
-            if (!filteredCategories || filteredCategories.length === 0) {
+            const totalCategories = await Category.find({
+                name: { $regex: searchParams, $options: 'i' }
+            });
+
+            const totalPages = Math.ceil(totalCategories / limit);
+            
+
+            if (!categories || categories.length === 0) {
                 return res.status(404).json({ message: "No filtered categories found" });
             }
 
-            res.status(200).json(filteredCategories);
-
+            res.status(200).json({
+                categories,
+                totalPages,
+              });
         } else {
             const categories = await Category.find({})
                 .sort({ createdAt: -1 })
                 .skip((page - 1) * limit)
                 .limit(limit);
 
+            const totalCategories = await Category.countDocuments({});
+            const totalPages = Math.ceil(totalCategories / limit);
+
+
             if (!categories || categories.length === 0) {
                 return res.status(404).json({ message: "No categories found" });
             }
 
-            res.status(200).json(categories);
+            res.status(200).json({
+                categories,
+                totalPages,
+              });
         }
 
     } catch (error) {
